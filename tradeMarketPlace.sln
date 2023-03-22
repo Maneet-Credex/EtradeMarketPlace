@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tradeMarketPlace", "tradeMarketPlace\tradeMarketPlace.csproj", "{73FDD52B-64E4-4F8F-A9AC-92E8EB0F47B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tradeMarketPlace-Frontend", "tradeMarketPlace-Frontend\tradeMarketPlace-Frontend.csproj", "{CCF27D9D-9B79-4EBE-BA40-91B181511F4E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73FDD52B-64E4-4F8F-A9AC-92E8EB0F47B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73FDD52B-64E4-4F8F-A9AC-92E8EB0F47B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73FDD52B-64E4-4F8F-A9AC-92E8EB0F47B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73FDD52B-64E4-4F8F-A9AC-92E8EB0F47B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCF27D9D-9B79-4EBE-BA40-91B181511F4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF27D9D-9B79-4EBE-BA40-91B181511F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCF27D9D-9B79-4EBE-BA40-91B181511F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCF27D9D-9B79-4EBE-BA40-91B181511F4E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59806601-F2B0-4B8D-B713-297165A4CF8F}
+	EndGlobalSection
+EndGlobal

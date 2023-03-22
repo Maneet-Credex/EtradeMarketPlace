@@ -1,0 +1,68 @@
+﻿@model List<BidsForRfpViewModel>
+
+@{
+    ViewData["Title"] = "RFP";
+    Layout = "~/Views/Shared/RfpLayout.cshtml";
+}
+
+<div class="grid panel">
+                <div class="panel-header">
+                    <span class="header-title">RFP NAME</span>
+                </div>
+                <div class="product panel-content">
+                    <!-- has grid -->
+                    <ul class="datatable-ul">
+  
+            <li class="datatable-item card-view">
+                <div class="child-items">
+                    <ul class="regions-content">
+                        @if (Model != null)
+                        {
+                            foreach (var bid in Model)
+                            {
+                                <li class="product-card-item product-card-wrapper">
+                                    <div class="panel card-panel product-card">
+                                        <div class="panel-header-container">
+                                            <div class="panel-header">@bid.Date.ToString("dd-MM-yyyy")</div>
+                                            <a href="@Url.Action("GetSenderChat", "Messages", new { ReceiverId = bid.UserId })">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="IconChangeColor" height="33" width="33">
+                                                <defs>
+                                                    <style>
+                                                        .cls-1 {
+                                                            fill: none;
+                                                            opacity: 0;
+                                                        }
+
+                                                        .cls-2 {
+                                                                fill: #A3A1A1;
+                                                        }</style>
+                                                </defs>
+                                                <title>message seller</title>
+                                                <g id="Layer_2" data-name="Layer 2"><g id="message-square"><g id="message-square-2" data-name="message-square"><rect class="cls-1" width="24" height="24"></rect><circle class="cls-2" cx="12" cy="11" r="1"></circle><circle class="cls-2" cx="16" cy="11" r="1"></circle><circle class="cls-2" cx="8" cy="11" r="1"></circle><path class="cls-2" d="M19,3H5A3,3,0,0,0,2,6V21a1,1,0,0,0,.51.87A1,1,0,0,0,3,22a1,1,0,0,0,.51-.14L8,19.14A1,1,0,0,1,8.55,19H19a3,3,0,0,0,3-3V6A3,3,0,0,0,19,3Zm1,13a1,1,0,0,1-1,1H8.55A3,3,0,0,0,7,17.43l-3,1.8V6A1,1,0,0,1,5,5H19a1,1,0,0,1,1,1Z" id="mainIconPathAttribute"></path></g></g></g>
+                                            </svg>
+                                        </a>
+                                        </div>
+                                        <div class="panel-content">
+                                            <p class="product-name">Maneet</p>
+                                            <p class="product-price">$@bid.Price</p>
+                                            <p class="product-description">@Html.Raw(@bid.Comments)</p>
+                                            <p class="category">@bid.OrgatisationName</p>
+                                        </div>
+                                        <button type="button" class="btn btn-green pull-right" id="toggle-button">Accept</button>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <p>No Bids</p>
+                        }
+
+                     </ul>
+                </div>
+            </li>
+                    </ul>
+                </div>
+
+            </div>
+

@@ -1,0 +1,23 @@
+﻿@model BidsViewModel
+@{
+    Layout = null;
+}
+
+<h2>Update Bid</h2>
+        <form asp-action="EditBid" asp-controller="DashBoardSeller" asp-method="put">
+                <input type="hidden" asp-for="BidId" value="@Model.BidId" />
+                <input type="hidden" asp-for="RfpId" value="@Model.RfpId" />
+                <input type="hidden" asp-for="CreatedBy" value="@Model.CreatedBy" />
+            <div class="form-group">
+                <label asp-for="Price">Price</label>
+                <input asp-for="Price" class="form-control" name="Price" id="project-name" required="required" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments">Comment</label>
+                <textarea asp-for="Comments" class="form-control" id="Comment" rows="5" required="required"></textarea>
+                <script>
+                    CKEDITOR.replace('Comment');
+                </script>
+            </div>
+            <button type="submit" class="btn btn-dark w-100 font-weight-bold mt-2">Submit</button>
+        </form>

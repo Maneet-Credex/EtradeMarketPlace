@@ -1,0 +1,36 @@
+﻿@model MessagesViewModel
+@{
+    Layout = "~/Views/Shared/MessageLayout.cshtml";
+    var messages = ViewBag.messages;
+    int userid = ViewBag.SenderChatId;
+    int recieverId = ViewBag.RecieverChatId;
+}
+<!DOCTYPE html>
+
+  <ol id="chat-box" class="chat" data-receiver-id="@recieverId">
+    @if (messages != null)
+      {     
+    @foreach(var msg in messages ){
+        
+    @if (msg.SenderId == userid)
+    { 
+        <li class="self">
+            <div class="msg">
+             <p>@msg.MessageContent</p>
+               <time>20:18</time>
+            </div>
+        </li>
+    }else{
+
+        <li class="other">
+            <div class="msg">
+                <div class="user"></div>
+                  <p>@msg.MessageContent</p>
+                <time>20:17</time>
+            </div>
+        </li>
+         }
+      }
+    }
+    </ol>
+   

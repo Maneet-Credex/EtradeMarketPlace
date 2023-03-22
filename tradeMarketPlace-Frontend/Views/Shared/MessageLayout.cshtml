@@ -1,0 +1,39 @@
+﻿@model MessagesViewModel
+
+@{
+    Layout = null;
+    var messages = ViewBag.messages;
+    int userid = ViewBag.SenderChatId;
+    int recieverId = ViewBag.RecieverChatId;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/css/messageStyle.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+    <div class="menu">
+        <a href="#" class="back">
+            <i class="fa fa-angle-left"></i>
+            <img src="https://i.imgur.com/G4EjwqQ.jpg" draggable="false" />
+        </a>
+        <div class="name">@ViewBag.ReceiverName</div>
+    </div>
+        @RenderBody()
+
+     <div class="typezone">
+    <form asp-action="GetSenderChat" asp-controller="Messages" method="post">
+        <input type="hidden" asp-for="ReceiverId" value="@recieverId" />
+        <textarea asp-for="MessageContent" placeholder="Say something"></textarea>
+        <Button type="submit" class="send" value="" >.</Button> 
+    </form>
+    </div>
+</body>
+<script src="~/js/Message.js"></script>
+</html>

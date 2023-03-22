@@ -1,0 +1,52 @@
+﻿@model  RfpViewModel
+@{
+    Layout = null;
+}
+
+    <h2>Edit RFP</h2>
+       <form asp-action="EditRfp" asp-controller="DashBoardBuyer" asp-method="put">
+            <input type="hidden" asp-for="RfpId" value="@Model.RfpId" />
+            <input type="hidden" asp-for="CreatedBy" value="@Model.CreatedBy" />
+        <div class="form-group">
+            <label asp-for="RfpName">RFP Name</label>
+            <input asp-for="RfpName" class="form-control" name="RFPName" id="project-name" required="required"  value="@Model.RfpName"/>
+        </div>
+        <div class="form-group">
+            <label asp-for="Quantity">Quantity</label>
+        <input asp-for="Quantity" class="form-control" id="budget" type="number" required="required" value="@Model.Quantity" />
+        </div>
+        <div class="form-group">
+            <label asp-for="ProductCategoryId">Product Category</label>
+        <select asp-for="ProductCategoryId" asp-items="@(new SelectList(ViewBag.DataPc, "ProductCategoryId", "Name"))" class="form-control" id="editCategoryDropdown" required="required" onchange="editLoadSubcategories()">
+                <option value="">Select a product</option>
+            </select>
+        </div>
+    <div class="form-group">
+        <label asp-for="ProductSubCategoryId">Sub Category</label>
+        <select asp-for="ProductSubCategoryId" id="editSubcategoryDropdown" class="form-control"  required="required" onchange="editLoadProducts()">
+            <option value="">Select product Sub-Category</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProductId">Product</label>
+        <select asp-for="ProductId" class="form-control"  id="editProductDropdown" required="required">
+            <option value="">Select product </option>
+        </select>
+    </div>
+        <div class="form-group">
+            <label asp-for="RfpDescription">RFP Description</label>
+        <textarea asp-for="RfpDescription" class="form-control" id="project-description-edit" rows="5" required="required" value="@Model.RfpDescription"></textarea>
+            <script>
+                CKEDITOR.replace('project-description-edit');
+            </script>
+        </div>
+        <div class="form-group">
+            <label asp-for="MaxPrice">Budget</label>
+        <input asp-for="MaxPrice" class="form-control" id="budget" type="number" required="required" value="@Model.MaxPrice" />
+        </div>
+        <div class="form-group">
+            <label asp-for="LastDate">Last Date</label>
+        <input asp-for="LastDate" class="form-control" id="last-date" type="date" required="required" value="@Model.LastDate" />
+        </div>
+<button type="submit" class="btn btn-dark w-100 font-weight-bold mt-2">Save</button>
+    </form>

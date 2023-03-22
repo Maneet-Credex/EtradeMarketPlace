@@ -1,0 +1,237 @@
+﻿   
+ @model RfpViewModel
+@{
+   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //string userName = Context.Session.GetString("userName");
+   // @model RfpViewModel
+}
+<div class="overlay" id="overlay"></div>
+
+<div class="form-popup" id="form-popup">
+    <div id="container">
+        <h2>New RFP</h2>
+        <form asp-action="buyer" asp-controller="DashBoardBuyer" method="post">
+            <div class="form-group">
+                <label asp-for="RfpName">RFP Name</label>
+                <input asp-for="RfpName" class="form-control" name="RFPName" id="project-name" required="required" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity">Quantity</label>3
+                <input asp-for="Quantity" class="form-control" id="budget" type="number" required="required" />
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductCategoryId">Category</label>
+                <select asp-for="ProductCategoryId" asp-items="@(new SelectList(ViewBag.DataPc ?? new SelectList(new List<object>()), "ProductCategoryId", "Name"))" id="categoryDropdown" required="required" onchange="loadSubcategories()">
+                    <option value="">Select product category</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProductSubCategoryId">Sub Category</label>
+                <select asp-for="ProductSubCategoryId" id="subcategoryDropdown" required="required" onchange="loadProducts()">
+                    <option value="">Select product Sub-Category</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductId">Product</label>
+                <select asp-for="ProductId" id="productDropdown" required="required">
+                    <option value="">Select product </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="RfpDescription">RFP Description</label>
+                <textarea asp-for="RfpDescription" class="form-control" id="project-description" rows="5" required="required"></textarea>
+                <script>
+                    CKEDITOR.replace('project-description');
+                </script>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxPrice">Budget</label>
+                <input asp-for="MaxPrice" class="form-control" id="budget" type="number" required="required" />
+            </div>
+            <div class="form-group">
+                <label asp-for="LastDate">Last Date</label>
+                <input asp-for="LastDate" class="form-control" id="last-date" type="date" required="required" />
+            </div>
+            <button type="submit" class="btn btn-dark w-100 font-weight-bold mt-2">Submit</button>
+        </form>
+
+
+        <button class="close-button" id="close-button">&times;</button>
+    </div>
+</div>
+
+  <div class="app-content">
+    <div class="projects-section">
+      <div class="projects-section-header">
+        <p>RFP</p>
+      </div>
+      <div class="projects-section-line">
+        <div class="projects-status">
+          <div class="item-status">
+                    @{
+                        var RFPList = ViewBag.rfpData as List<RfpViewModel> ?? new List<RfpViewModel>();
+                        int totalCount = RFPList.Count() > 0 ? RFPList.Count() : 0;
+                        int openCount = RFPList.Count() > 0 ? RFPList.Count((Func<RfpViewModel, bool>)(r => r.Status == "open")) : 0;
+                        int closedCount = RFPList.Count() > 0 ? RFPList.Count((Func<RfpViewModel, bool>)(r => r.Status == "closed")) : 0;
+                    }
+            <span class="status-number"> @openCount</span>
+            <span class="status-type">In Progress</span>
+          </div>
+          <div class="item-status">
+            <span class="status-number">@closedCount</span>
+            <span class="status-type">Completed</span>
+          </div>
+          <div class="item-status">
+            <span class="status-number">@totalCount</span>
+            <span class="status-type">Total RFP</span>
+          </div>
+        </div>
+        <div class="view-actions">
+          <button class="view-btn list-view" title="List View">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="feather feather-list">
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" />
+              <line x1="3" y1="12" x2="3.01" y2="12" />
+              <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+          </button>
+          <button class="view-btn grid-view active" title="Grid View">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="feather feather-grid">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="project-boxes jsGridView">
+            @if (ViewBag.rfpdata != null)
+            {
+                
+            @foreach (var rfp in ViewBag.rfpdata)
+        {
+                var progress = new RfpProgressViewModel
+             {
+                  CreatedDate = rfp.CreationDate,
+                  LastDate = rfp.LastDate,
+             };
+                var width = $"{progress.ProgressPercentage.Percentage}%";
+                var daysLeft = Convert.ToInt32($"{progress.ProgressPercentage.DaysLeft}");
+
+                var productCategoryName = ((IEnumerable<dynamic>)ViewBag.DataPc)
+                .Where(p => p.ProductCategoryId == rfp.ProductCategoryId)
+                .Select(p => p.Name)
+                .FirstOrDefault();
+
+                    <div class="project-box-wrapper">
+
+              <div class="project-box" style="background-color: #d5deff;">
+                <div class="project-box-header">    
+                  <span>@rfp.CreationDate</span>
+                            <div class="more-wrapper ">
+                                <button class="project-btn-more ">
+
+
+                                    @if (rfp != null)
+                                    {
+                                            <a onclick="showInPopup('@Url.Action("EditRfp", "DashBoardBuyer", new { rfpid  = @rfp.RfpId })')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                         class="feather feather-edit">
+                                                <path d="M3 17v4h4l14-14-4-4L3 17z" />
+                                                <path d="M16.5 3.5l4 4" />
+                                                <path d="M21 6l-4-4" />
+                                            </svg>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <p>No RFP</p>
+                                    }
+                                   
+                                    
+                                </button>
+                            </div>
+                </div>
+                            <div class="project-box-content-header" onclick="window.location.href='@Url.Action("RFP", "DashBoardRFP", new { rfpid = @rfp.RfpId })'">
+                  <p class="box-content-header">@rfp.RfpName</p>
+                  <p class="box-content-subheader">@productCategoryName</p>
+                </div>
+                <div class="box-progress-wrapper">
+                  <p class="box-progress-header">Progress</p>
+                  <div class="box-progress-bar">
+                    <span class="box-progress" style="width: @width; background-color: #4067f9"></span>
+                  </div>
+                  <p class="box-progress-percentage">@width</p>
+                </div>
+                <div class="project-box-footer">
+                  <div class="days-left" style="color: #4067f9;">
+                     @(daysLeft <= 0 ? "Closed" : $"{daysLeft} Days Left")
+                  </div>
+                </div>
+              </div>
+                    </div>
+
+                }
+
+            }
+            else
+            {
+                <p>You Have No RFP</p>
+            }
+      </div>
+    </div>
+    <div class="messages-section">
+      <button class="messages-close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="feather feather-x-circle">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="15" y1="9" x2="9" y2="15" />
+          <line x1="9" y1="9" x2="15" y2="15" />
+        </svg>
+      </button>
+      <div class="projects-section-header">
+        <p>Seller Messages</p>
+      </div>
+      <div class="messages">
+            @if (ViewBag.Messages != null && ViewBag.Messages.Count > 0)
+            {
+
+                @foreach (var msg in ViewBag.Messages)
+                {
+                    <div class="message-box" onclick="window.location.href='@Url.Action("GetSenderChat", "Messages", new { ReceiverId = @msg.ReceiverId })'">
+                        <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 45px; height: 40px;">P</span>
+
+                        <div class="message-content">
+                            <div class="message-header">
+                                <div class="name">@msg.ReceiverName</div>
+                            </div>
+                            <p class="message-line">
+                                @msg.MessageContent
+                            </p>
+                            <p class="message-line time">
+                                @msg.Date
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No Conversation</p>
+            }
+        </div>
+    </div>
+  </div>
+   
