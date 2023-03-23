@@ -51,9 +51,10 @@ namespace tradeMarketPlace.Controllers
 
 
             // Select only the desired RFP properties
-            var rfpData = new
+            var rfpData = new RfpPdf
             {
                 Title = bid.Rfp.RfpName,
+                RfpID = bid.Rfp.RfpId,
                 RfpQuantity = bid.Rfp.Quantity,
                 RfpPrice = bid.Rfp.MaxPrice,
                 RfpLastDate = bid.Rfp.LastDate,
@@ -63,20 +64,24 @@ namespace tradeMarketPlace.Controllers
                 ProductName = bid.Rfp.Product.Name,
                 ProductDescription = bid.Rfp.Product.Description,
 
-                User = new
+                Buyer = new User
                 {
-                    Name = bid.Rfp.User.FirstName,
+                    FirstName = bid.Rfp.User.FirstName,
+                    LastName = bid.Rfp.User.LastName,
                     Email = bid.Rfp.User.Email,
+                    Type = bid.Rfp.User.Type,
                     OrganisationName = bid.Rfp.User.OrganisationName,
                     ContactNumber = bid.Rfp.User.ContactNumber,
                 }
             };
 
             // Select only the desired User properties for the seller
-            var sellerData = new
+            var sellerData = new User
             {
-                Name = bid.User.FirstName,
+                FirstName = bid.User.FirstName,
+                LastName = bid.Rfp.User.LastName,
                 Email = bid.User.Email,
+                Type = bid.User.Type,
                 OrganisationName = bid.User.OrganisationName,
                 ContactNumber = bid.User.ContactNumber,
             };

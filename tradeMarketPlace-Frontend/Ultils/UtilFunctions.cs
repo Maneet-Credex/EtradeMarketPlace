@@ -99,6 +99,27 @@ namespace tradeMarketPlace_Frontend.Ultils
             }
         }
 
+        public async Task<PurchaseOrderViewModel> GetBidRfpData(int bidId)
+        {
+            try
+            {
+                // Send the GET request and get the response
+                HttpResponseMessage response = await _httpClient.GetAsync($"Bids/{bidId}");
+                response.EnsureSuccessStatusCode();
+
+                // Read the response content as a string
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                // Parse the JSON response to a list of Rfp objects
+                PurchaseOrderViewModel rfpBid = JsonConvert.DeserializeObject<PurchaseOrderViewModel>(responseBody);
+                return rfpBid;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting Messages.", ex);
+            }
+        }
 
     }
 }

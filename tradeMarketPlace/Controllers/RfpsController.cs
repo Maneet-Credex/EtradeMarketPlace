@@ -101,6 +101,27 @@ namespace tradeMarketPlace.Controllers
             return Ok(response);
         }
 
+        [HttpPut("status/{rfpId}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<Rfp>> Status(int rfpId)
+        {
+            // Fetch the RFP from the database
+            var rfp = await _context.Rfp.FindAsync(rfpId);
+
+            // Check if the RFP exists
+            if (rfp == null)
+            {
+                return NotFound();
+            }
+
+            // Update the RFP status to closed
+            rfp.Status = "closed";
+            _context.Entry(rfp).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            // Return the updated RFP
+            return NoContent();
+        }
 
 
         // PUT: api/Rfps/5
@@ -146,6 +167,40 @@ namespace tradeMarketPlace.Controllers
 
             return CreatedAtAction("GetRfp", new { id = rfp.RfpId }, rfp);
         }
+
+        [HttpGet("updateStatus/{rfpId}")]
+        [Authorize(Roles = "buyer")]
+        public async Task<ActionResult<Rfp>> updateStatus(int rfpId)
+        {
+            var rfp = await _context.Rfp.FindAsync(rfpId);
+
+            if (rfp == null)
+            {
+                return NotFound();
+            }
+
+            // Update the rfp status
+            rfp.Status = "closed";
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RfpExists(rfpId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return rfp;
+        }
+
 
         // DELETE: api/Rfps/5
         [HttpDelete("{id}")]

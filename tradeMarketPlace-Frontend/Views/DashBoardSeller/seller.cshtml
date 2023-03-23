@@ -107,7 +107,7 @@
                 .FirstOrDefault();
 
                 <div class="project-box-wrapper">
-                    <div class="project-box" style="background-color: #d5deff;">
+                    <div class="project-box" style="background-color: #d5deff;" onclick="window.location.href='@Url.Action("RfpDetail", "DashBoardSeller", new { rfpid = @rfp.RfpId })'">
                         <div class="project-box-header">
                             <span>@rfp.CreationDate</span>
                             <div class="more-wrapper ">

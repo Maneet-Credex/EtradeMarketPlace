@@ -1,4 +1,7 @@
-﻿namespace tradeMarketPlace_Frontend.Models
+﻿using System.Net.Http.Headers;
+using System.Text;
+
+namespace tradeMarketPlace_Frontend.Models
 {
     public class RfpViewModel
 
@@ -61,6 +64,32 @@
                 };
             }
         }
+        public async Task ChangeRfpStatusToClosed(int rfpId)
+        {
+            // Code to make API call to change RFP status to closed
+
+            using (var client = new HttpClient())
+            {
+                // Set the API endpoint URL
+                var apiUrl = $"https://localhost:7014/api/rfps/status/{rfpId}";
+
+                // Create the request content (if any)
+                var requestContent = new StringContent("", Encoding.UTF8, "application/json");
+
+                // Add any required headers (e.g. authentication token)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "<your-authentication-token>");
+
+                // Make the API call
+                var response = await client.PutAsync(apiUrl, requestContent);
+
+                // Check if the API call was successful
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Handle error
+                    throw new Exception("Failed to change RFP status to closed.");
+                }
+            }
+        }
     }
 
     public class RfpViewData
@@ -71,5 +100,22 @@
         public List<ProductCategoryViewModel> ProductCategories { get; set; }
         //public List<RfpViewModel> rfpModel { get; set; }
         // public RfpViewModel rfpModel { get; set; }
+    }
+
+    public class RfpPdfViewModel
+    {
+
+        public string Title { get; set; }
+        public int RfpId { get; set; }
+        public int RfpQuantity { get; set; }
+        public decimal RfpPrice { get; set; }
+        public DateTime RfpLastDate { get; set; }
+        public string Description { get; set; }
+        public string ProductCategory { get; set; }
+        public string ProductSubCategory { get; set; }
+        public string ProductName { get; set; }
+        public string ProductDescription { get; set; }
+        public UserViewModel Buyer { get; set; }
+
     }
 }

@@ -36,3 +36,12 @@ public partial class PurchaseOrder
 
     public virtual User? UpdatedByNavigation { get; set; } = null!;
 }
+
+
+public class PurchaseOrderPdf
+{
+    public int Id { get; set; }
+    public decimal BidPrice { get; set; }
+    public RfpPdf Rfp { get; set; }
+    public User Seller { get; set; }
+}

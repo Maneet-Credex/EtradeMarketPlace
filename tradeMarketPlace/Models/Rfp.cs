@@ -44,3 +44,20 @@ public partial class Rfp
 
     public virtual User? User { get; set; } = null!;
 }
+
+public class RfpPdf
+{
+
+    public string Title { get; set; }
+    public int RfpID { get; set; }
+    public int RfpQuantity { get; set; }
+    public decimal RfpPrice { get; set; }
+    public DateTime RfpLastDate { get; set; }
+    public string Description { get; set; }
+    public string ProductCategory { get; set; }
+    public string ProductSubCategory { get; set; }
+    public string ProductName { get; set; }
+    public string ProductDescription { get; set; }
+    public User Buyer { get; set; }
+
+}

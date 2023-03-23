@@ -1,5 +1,6 @@
 ﻿   
  @model RfpViewModel
+ @using tradeMarketPlace_Frontend.Models
 @{
    
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -120,14 +121,23 @@
                 
             @foreach (var rfp in ViewBag.rfpdata)
         {
-                var progress = new RfpProgressViewModel
+                var progress = new RfpProgressViewModel()
              {
                   CreatedDate = rfp.CreationDate,
                   LastDate = rfp.LastDate,
              };
-                var width = $"{progress.ProgressPercentage.Percentage}%";
-                var daysLeft = Convert.ToInt32($"{progress.ProgressPercentage.DaysLeft}");
+                    var width = $"{progress.ProgressPercentage.Percentage}%";
+                    var daysLeft = Convert.ToInt32($"{progress.ProgressPercentage.DaysLeft}");
 
+                    if(rfp.Status == "open")
+                    {
+                      
+                        if (progress.ProgressPercentage.Percentage >= 100)
+                        {
+                            // Call the API to change the RFP status to closed for the current rfpId
+                            await progress.ChangeRfpStatusToClosed(rfp.RfpId);
+                        }
+                    }
                 var productCategoryName = ((IEnumerable<dynamic>)ViewBag.DataPc)
                 .Where(p => p.ProductCategoryId == rfp.ProductCategoryId)
                 .Select(p => p.Name)

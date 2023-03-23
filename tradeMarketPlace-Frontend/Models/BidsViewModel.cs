@@ -31,7 +31,7 @@
         public decimal Price { get; set; }
         public DateTime Date { get; set; }
         public string Comments { get; set; }
-        public string OrgatisationName { get; set; }
+        public string organisationName { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; }
         public string RfpName { get; set; }

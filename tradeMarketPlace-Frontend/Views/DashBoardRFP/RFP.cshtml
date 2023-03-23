@@ -43,12 +43,13 @@
                                         </a>
                                         </div>
                                         <div class="panel-content">
-                                            <p class="product-name">Maneet</p>
+                                            <p class="product-name">@bid.organisationName</p>
                                             <p class="product-price">$@bid.Price</p>
                                             <p class="product-description">@Html.Raw(@bid.Comments)</p>
-                                            <p class="category">@bid.OrgatisationName</p>
                                         </div>
-                                        <button type="button" class="btn btn-green pull-right" id="toggle-button">Accept</button>
+                                        <form action="@Url.Action("RFP", "DashBoardRFP", new { bidId = bid.BidId })" method="post">
+                                            <button type="submit" class="btn btn-green pull-right" id="toggle-button">Accept</button>
+                                        </form>
                                     </div>
                                 </li>
                             }

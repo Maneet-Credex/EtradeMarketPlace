@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using iTextSharp.text;
+using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PdfSharpCore;
-using PdfSharpCore.Pdf;
 using System.Net;
 using System.Net.Mail;
-using TheArtOfDev.HtmlRenderer.PdfSharp;
 using tradeMarketPlace.Models;
 
 namespace tradeMarketPlace.Controllers
@@ -102,74 +101,112 @@ namespace tradeMarketPlace.Controllers
         }
 
 
-        [HttpGet("generatepdf")]
-        public async Task<IActionResult> GeneratePDF(string InvoiceNo)
+        [HttpPost("generatepdf")]
+
+        public async Task<IActionResult> GeneratePDF(PurchaseOrderPdf model)
         {
-            var document = new PdfDocument();
-            string htmlcontent = "<h1>Purchase Order</h1>";
-            //string htmlcontent = "<div style='display:flex; flex-direction:column; justify-content:center; '>";
-            //htmlcontent += "<h2>" + "sddsdad" + "</h2>";
-            //htmlcontent += "<h2>Welcome to Nihira Techiees</h2>";
+            var buyer = model.Rfp.Buyer;
+            var seller = model.Seller;
+            // Create a new PDF document
+            var document = new Document();
+            var output = new MemoryStream();
+            var writer = PdfWriter.GetInstance(document, output);
 
-            ////table to from 
-            //htmlcontent += "<table style ='border: 1px solid black; padding: 10px'>";
-            //htmlcontent += "<thead style='font-weight:bold'>";
-            //htmlcontent += "<tr>";
-            //htmlcontent += "<td style='border:1px solid #000'> Product Code </td>";
-            //htmlcontent += "<td style='border:1px solid #000'> Description </td>";
-            //htmlcontent += "<td style='border:1px solid #000'>Qty</td>";
-            //htmlcontent += "<td style='border:1px solid #000'>Price</td >";
-            //htmlcontent += "<td style='border:1px solid #000'>Total</td>";
-            //htmlcontent += "</tr>";
-            //htmlcontent += "</thead >";
+            // Set document properties
+            document.Open();
+            document.AddAuthor("E-Trade Market Place");
+            document.AddCreator("E-Trade Market Place");
+            document.AddKeywords($"{model.Rfp.Title} Purchase Order, Invoice");
+            document.AddSubject("Purchase Order");
+            document.AddTitle("Purchase Order");
 
-            PdfGenerator.AddPdfPages(document, htmlcontent, PageSize.A4);
+            // Add logo
 
-            byte[]? response = null;
-            using (MemoryStream ms = new MemoryStream())
+            var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "util", "credex-technology-Logo.png");
+            var logo = Image.GetInstance(logoPath);
+            logo.ScaleToFit(150f, 150f);
+            logo.SpacingAfter = 10f;
+            logo.Alignment = Element.ALIGN_RIGHT;
+            document.Add(logo);
+
+            // Add heading
+            var heading = new Paragraph("Purchase Order", new Font(Font.FontFamily.TIMES_ROMAN, 24f, Font.BOLD));
+            heading.Alignment = Element.ALIGN_LEFT;
+            heading.SpacingAfter = 20f;
+            document.Add(heading);
+
+            var fromToTable = new PdfPTable(2);
+
+            // Set the width percentage of the table
+            fromToTable.WidthPercentage = 100;
+
+            // Add the header row to the table
+            fromToTable.AddCell(new PdfPCell(new Phrase("FROM", new Font(Font.FontFamily.HELVETICA, 8f, Font.BOLD))));
+            fromToTable.AddCell(new PdfPCell(new Phrase("To", new Font(Font.FontFamily.HELVETICA, 8f, Font.BOLD))));
+
+            // Add the data row to the table
+            fromToTable.AddCell(new PdfPCell(new Phrase($"{buyer.OrganisationName}\nATTN: {buyer.FirstName}\nEmail: {buyer.Email}\nPhone: +91{buyer.ContactNumber}", new Font(Font.FontFamily.HELVETICA, 12f))));
+            fromToTable.AddCell(new PdfPCell(new Phrase($"{seller.OrganisationName}\nATTN: {seller.FirstName}\nEmail: {seller.Email}\nPhone: +91{seller.ContactNumber}", new Font(Font.FontFamily.HELVETICA, 12f))));
+
+            // Add the table to the document
+
+            // Add table
+            var table = new PdfPTable(6);
+            table.WidthPercentage = 100;
+            table.SpacingBefore = 20f;
+            table.SpacingAfter = 30f;
+
+            // Add column headers
+            table.AddCell(new PdfPCell(new Phrase("Item Name", new Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD))));
+            table.AddCell(new PdfPCell(new Phrase("RFP Titile", new Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD))));
+            table.AddCell(new PdfPCell(new Phrase("Quantity", new Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD))));
+            table.AddCell(new PdfPCell(new Phrase("Price", new Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD))));
+            table.AddCell(new PdfPCell(new Phrase("tax", new Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD))));
+            table.AddCell(new PdfPCell(new Phrase("Total", new Font(Font.FontFamily.HELVETICA, 12f, Font.BOLD))));
+
+            // Add table data
+            table.AddCell(new PdfPCell(new Phrase(model.Rfp.ProductName, new Font(Font.FontFamily.HELVETICA, 12f))));
+            table.AddCell(new PdfPCell(new Phrase(model.Rfp.Title, new Font(Font.FontFamily.HELVETICA, 12f))));
+            table.AddCell(new PdfPCell(new Phrase($"{model.Rfp.RfpQuantity}", new Font(Font.FontFamily.HELVETICA, 12f))));
+            table.AddCell(new PdfPCell(new Phrase($"${model.BidPrice}", new Font(Font.FontFamily.HELVETICA, 12f))));
+            table.AddCell(new PdfPCell(new Phrase("18%", new Font(Font.FontFamily.HELVETICA, 12f))));
+            table.AddCell(new PdfPCell(new Phrase($"${model.BidPrice + ((model.BidPrice) * 18) / 100}", new Font(Font.FontFamily.HELVETICA, 12f))));
+
+            // Add table to document
+            document.Add(fromToTable);
+            document.Add(table);
+
+
+
+            // Close the document
+            document.Close();
+
+            // Send the PDF as a response and attach it to an email
+            var bytes = output.ToArray();
+
+            // Send email with PDF attachment
+            var message = new MailMessage();
+            message.From = new MailAddress("maneetsingh20018@gmail.com");
+            message.To.Add(new MailAddress($"{seller.Email}"));
+            message.Subject = $"Purchase Order For {model.Rfp.ProductName}";
+            message.Body = $"Congratulation {model.Seller.FirstName} you have won bid for {model.Rfp.RfpQuantity} {model.Rfp.Title} Please find the attached Purchase Order in attachment";
+
+            // Attach PDF to email
+            message.Attachments.Add(new Attachment(new MemoryStream(bytes), "PurchaseOrder.pdf"));
+
+            using (var smtp = new SmtpClient("smtp.gmail.com", 587))
             {
-                document.Save(ms);
-                response = ms.ToArray();
+                smtp.UseDefaultCredentials = false;
+                smtp.EnableSsl = true;
+                smtp.Credentials = new NetworkCredential("maneetsingh20018@gmail.com", "uxbjeucjlsqndshr");
+
+                await smtp.SendMailAsync(message);
             }
 
-            string Filename = "Invoice_" + InvoiceNo + ".pdf";
-            string filepath = Path.Combine(Directory.GetCurrentDirectory(), "PDFs", Filename);
-            using (FileStream fs = new FileStream(filepath, FileMode.Create))
-            {
-                await fs.WriteAsync(response, 0, response.Length);
-            }
+            // Return PDF file as response
+            return File(bytes, "application/pdf", $"{model.Seller.OrganisationName}PurchaseOrderInvoice.pdf");
 
-            // Send email
-            using (var client = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587))
-            {
-                client.EnableSsl = true;
-                client.Timeout = 10000;
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential("maneetsingh20018@gmail.com", "uxbjeucjlsqndshr");
-
-                var message = new MailMessage();
-                message.From = new MailAddress("maneetsingh20018@gmail.com");
-                message.To.Add(new MailAddress("dope.godfather@gmail.com"));
-                message.Subject = "Your subject";
-                message.Body = "Your email message body";
-                message.Attachments.Add(new Attachment(filepath));
-
-                try
-                {
-                    client.Send(message);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception caught in CreateTestMessage(): {0}",
-                                ex.ToString());
-                }
-            }
-
-            return File(response, "application/pdf", Filename);
         }
-
-
 
         private bool PurchaseOrderExists(int id)
         {
@@ -179,3 +216,32 @@ namespace tradeMarketPlace.Controllers
 
     }
 }
+
+// Send email
+//using (var client = new System.Net.Mail.SmtpClient("smtp.gmail.com", 587))
+//{
+//    client.EnableSsl = true;
+//    client.Timeout = 10000;
+//    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+//    client.UseDefaultCredentials = false;
+//    client.Credentials = new NetworkCredential("maneetsingh20018@gmail.com", "uxbjeucjlsqndshr");
+
+//    var message = new MailMessage();
+//    message.From = new MailAddress("maneetsingh20018@gmail.com");
+//    message.To.Add(new MailAddress("dope.godfather@gmail.com"));
+//    message.Subject = "Bid Get Accepted";
+//    message.Body = "Congratulation your bid has been get accecpted";
+//    message.Attachments.Add(new Attachment(message));
+
+//    try
+//    {
+//        client.Send(message);
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine("Exception caught in CreateTestMessage(): {0}",
+//                    ex.ToString());
+//    }
+//}
+
+//return File(response, "application/pdf", Filename);
